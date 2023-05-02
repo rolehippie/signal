@@ -1,0 +1,28 @@
+# Standards: 1.2
+---
+- name: Download repo key
+  shell:
+    cmd: curl -sSL https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor --output /usr/share/keyrings/signal-archive-keyring.gpg
+    creates: /usr/share/keyrings/signal-archive-keyring.gpg
+  tags:
+    - signal
+
+- name: Add apt repository
+  apt_repository:
+    repo: deb [arch=amd64 signed-by=/usr/share/keyrings/signal-archive-keyring.gpg] https://updates.signal.org/desktop/apt xenial main
+    filename: signal
+    update_cache: True
+    state: present
+  tags:
+    - signal
+
+- name: Install required packages
+  loop:
+    - signal-desktop
+  package:
+    name: "{{ item }}"
+    state: present
+  tags:
+    - signal
+
+...
